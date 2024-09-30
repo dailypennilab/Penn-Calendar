@@ -7,33 +7,45 @@ const Student = require('./models/Student'); // Import Student model
 const app = express();
 app.use(express.json()); // Middleware to parse JSON requests
 
+const CONNECTION_STRING = "mongodb+srv://ilabmanager:n7VkZ0SoHEjmQlBw@penncalendar.rjlgg.mongodb.net/?retryWrites=true&w=majority&appName=PennCalendar";
+const DATABASE_NAME = "calendardb";
+
 // Connect to MongoDB with error handling
-mongoose.connect('mongodb://localhost/penn-calendar', { 
-  useNewUrlParser: true, 
-  useUnifiedTopology: true 
-})
+mongoose.connect(CONNECTION_STRING)
   .then(() => console.log('Connected to MongoDB'))
   .catch(err => console.error('Error connecting to MongoDB:', err));
 
-// Example route to add a new student
-app.post('/students', async (req, res) => {
-  const { name, year, email, password } = req.body;
+app.get('/', (req, res) => {
+  res.send('mongodb connection test');
+});
 
-  // Check if all fields are provided
-  if (!name || !year || !email || !password) {
-    return res.status(400).send({ error: 'All fields are required' });
-  }
+app.listen(5038, () => {
+  console.log('server running on port 5038');
+});
 
+// Sample route to add a student
+app.post('/add-student', async (req, res) => {
   try {
-    // Hash the password before saving
-    const hashedPassword = await bcrypt.hash(password, 10);
-    
+    const { name, year, email, password } = req.body; // Get student info from request body
+
     // Create a new student object
-    const student = new Student({ 
-      name, 
-      year, 
-      email, 
-      password: hashedPassword // Save hashed password
+    const newStudent = new Student({
+      name: name,
+      year: year,
+      email: email,
+      password: password, // This will be hashed in the StudentSchema pre-save hook
+      organizations: [],  // No organizations for now
+      registeredEvents: [] // No events registered yet
     });
-    
-    // Save
+
+    // Save the student to the database
+    const savedStudent = await newStudent.save();
+    res.status(201).json({
+      message: 'Student added successfully',
+      student: savedStudent
+    });
+  } catch (err) {
+    console.error('Error adding student:', err);
+    res.status(500).json({ error: 'Failed to add student' });
+  }
+});
