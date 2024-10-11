@@ -20,6 +20,8 @@ app.get('/', (req, res) => {
 
 // Import authentication routes
 app.use(authRoutes); // All authentication routes (register, login) handled in separate file
+app.use(orgRoutes);
+app.use(userRoutes);
 
 // Start the server
 app.listen(5038, () => {
