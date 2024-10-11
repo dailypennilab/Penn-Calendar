@@ -1,6 +1,8 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const authRoutes = require('./routes/authRoutes'); // Import authentication routes
+const userRoutes = require('./routes/userRoutes');
+const orgRoutes = require('./routes/orgRoutes')
 
 const app = express();
 app.use(express.json()); // Middleware to parse JSON requests
