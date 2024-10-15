@@ -1,7 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const authRoutes = require('./routes/authRoutes'); // Import authentication routes
-const userRoutes = require('./routes/userRoutes');
+const studentRoutes = require('./routes/studentRoutes');
 const orgRoutes = require('./routes/orgRoutes')
 
 const app = express();
@@ -21,7 +21,7 @@ app.get('/', (req, res) => {
 // Import authentication routes
 app.use(authRoutes); // All authentication routes (register, login) handled in separate file
 app.use(orgRoutes);
-app.use(userRoutes);
+app.use(studentRoutes);
 
 // Start the server
 app.listen(5038, () => {

@@ -6,54 +6,69 @@ const router = express.Router();
 
 // Student registration
 router.post('/register/student', async (req, res) => {
-  const { name, year, email, password } = req.body;
+  const student = req.body;
+
+  if (!student.name || !student.email || !student.password) {
+    return res.status(400).json({ success: false, message: "Please provide all required fields" });
+  }
+
   try {
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const student = new Student({ name, year, email, password: hashedPassword });
-    await student.save();
-    res.status(201).send('Student registered successfully');
+    student.password = await bcrypt.hash(student.password, 10);
+    const newStudent = new Student(student);
+    await newStudent.save();
+    res.status(201).json({ success: true, data: newStudent });
   } catch (err) {
-    res.status(500).send('Error registering student');
+    res.status(500).json({ success: false, message: "Error registering student" });
   }
 });
 
 // Organization registration
 router.post('/register/org', async (req, res) => {
-  const { name, orgType, email, password } = req.body;
+  const org = req.body;
+
+  if (!org.name || !org.orgType || !org.email || !org.password) {
+    return res.status(400).json({ success: false, message: "Please provide all required fields" })
+  }
+
   try {
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const org = new Org({ name, orgType, email, password: hashedPassword });
-    await org.save();
-    res.status(201).send('Organization registered successfully');
+    org.password = await bcrypt.hash(org.password, 10);
+    const newOrg = new Org(org);
+    await newOrg.save();
+    res.status(201).json({ success: true, data: newOrg });
   } catch (err) {
-    res.status(500).send('Error registering organization');
+    res.status(500).json({ success: false, message: "Error registering organization" });
   }
 });
 
 // Login route
 router.post('/login', async (req, res) => {
-  const { email, password, type } = req.body; // 'type' can be 'student' or 'org'
+  const login = req.body;
+
+  if (!login.email || !login.password || !login.type) {
+    return res.status(400).json({ success: false, message: "Please provide all required fields" });
+  }
+
   try {
     let user;
-    if (type === 'student') {
+    if (login.type === 'student') {
       user = await Student.findOne({ email });
-    } else if (type === 'org') {
+    } else if (login.type === 'org') {
       user = await Org.findOne({ email });
     }
 
     if (!user) {
-      return res.status(400).send('User not found');
+      return res.status(400).json({ success: false, message: 'User not found' });
     }
 
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await bcrypt.compare(login.password, user.password);
     if (!isMatch) {
-      return res.status(400).send('Invalid credentials');
+      return res.status(400).json({ success: false, message: 'Invalid credentials' });
     }
 
     // Successful login
-    res.status(200).send(`${type} logged in successfully`);
+    res.status(200).json({ success: true, message: `${type} logged in successfully`});
   } catch (err) {
-    res.status(500).send('Error logging in');
+    res.status(500).json({ success: true, message: 'Error logging in' });
   }
 });
 

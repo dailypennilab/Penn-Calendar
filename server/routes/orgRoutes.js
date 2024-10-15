@@ -1,70 +1,79 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const Org = require('../models/Org');
 const router = express.Router();
 
 // all organizations
 router.get('/organizations', async (req, res) => {
-    try {
-        const organizations = await Org.find();
-        res.status(200).json(organizations);
-      } catch (err) {
-        res.status(500).send('Error fetching organizations');
-      }
-    
-  });
+  try {
+    const organizations = await Org.find({});
+    res.status(200).json({ success: true, data: organizations });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Error fetching organizations' });
+  }
+});
 
 // specific organization by ID
 router.get('/organizations/:orgId', async (req, res) => {
-    const { orgId } = req.params;
-    try {
-        const organization = await Org.findById(orgId);
-        if (!organization) {
-            return res.status(404).send('Organization not found');
-        }
-    res.status(200).json(organization);
+  const { orgId } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(orgId)) {
+    return res.status(404).json({ success: false, message: "Invalid Org ID" });
+  }
+
+  try {
+    const organization = await Org.findById(orgId);
+    if (!organization) {
+        return res.status(404).json({ success: false, message: 'Organization not found' });
+    }
+    res.status(200).json({ success: true, data: organization });
   } catch (err) {
-    res.status(500).send('Error fetching organization details');
+    res.status(500).json({ success: false, message: 'Error fetching organization details' });
   }
 });
 
 //update organization details by ID
 router.put('/organizations/:orgId', async (req, res) => {
-    const { orgId } = req.params;
-    const {name, orgType, email} = req.body;
-    try {
-        const updatedOrg = await Org.findByIdAndUpdate(
-          orgId,
-          { name, orgType, email },
-          { new: true } // Return the updated document
-        );
-    
-        if (!updatedOrg) {
-          return res.status(404).send('Organization not found');
-        }
-    
-        res.status(200).json({
-          message: 'Organization updated successfully',
-          organization: updatedOrg,
-        });
-      } catch (err) {
-        res.status(500).send('Error updating organization details');
-      }
+  const { orgId } = req.params;
+  const org = req.body;
+
+  if (!mongoose.Types.ObjectId.isValid(orgId)) {
+    return res.status(404).json({ success: false, message: "Invalid Org ID" });
+  }
+
+  try {
+    if (org.password) {
+      org.password = await bcrypt.hash(org.password, 10);
+    }
+
+    const updatedOrg = await Org.findByIdAndUpdate(orgId, org, { new: true });
+
+    if (!updatedOrg) {
+      return res.status(404).json({ success: false, message: 'Organization not found' });
+    }
+
+    res.status(200).json({ success: true, data: updatedOrg });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Error updating organization details' });
+  }
 });
 
 router.delete('/organizations/:orgId', async (req, res) => {
-    const { orgId } = req.params;
-    try {
-        const deletedOrg = await Org.findByIdAndDelete(orgId);
-        if (!deletedOrg) {
-          return res.status(404).send('Organization not found');
-        }
-        res.status(200).json({
-          message: 'Organization deleted successfully',
-        });
-      } catch (err) {
-        res.status(500).send('Error deleting organization');
-      }
-});
+  const { orgId } = req.params;
 
+  if (!mongoose.Types.ObjectId.isValid(orgId)) {
+    return res.status(404).json({ success: false, message: "Invalid Org ID" });
+  }
+
+  try {
+    const deletedOrg = await Org.findByIdAndDelete(orgId);
+    if (!deletedOrg) {
+      return res.status(404).json({ success: false, message: 'Organization not found' });
+    }
+    res.status(200).json({ success: true, data: deletedOrg });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Error deleting organization' });
+  }
+});
 
 module.exports = router;
