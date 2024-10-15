@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const authRoutes = require('./routes/authRoutes'); // Import authentication routes
 const studentRoutes = require('./routes/studentRoutes');
 const orgRoutes = require('./routes/orgRoutes')
+const eventRoutes = require('./routes/eventRoutes')
 
 const app = express();
 app.use(express.json()); // Middleware to parse JSON requests
@@ -22,6 +23,7 @@ app.get('/', (req, res) => {
 app.use(authRoutes); // All authentication routes (register, login) handled in separate file
 app.use(orgRoutes);
 app.use(studentRoutes);
+app.use(eventRoutes);
 
 // Start the server
 app.listen(5038, () => {
