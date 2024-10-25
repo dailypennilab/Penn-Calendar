@@ -51,9 +51,9 @@ router.post('/login', async (req, res) => {
   try {
     let user;
     if (login.type === 'student') {
-      user = await Student.findOne({ email });
+      user = await Student.findOne({ login.email });
     } else if (login.type === 'org') {
-      user = await Org.findOne({ email });
+      user = await Org.findOne({ login.email });
     }
 
     if (!user) {
@@ -68,7 +68,7 @@ router.post('/login', async (req, res) => {
     // Successful login
     res.status(200).json({ success: true, message: `${type} logged in successfully`});
   } catch (err) {
-    res.status(500).json({ success: true, message: 'Error logging in' });
+    res.status(500).json({ success: true, message: `Error logging in: ${err.message}` });
   }
 });
 
