@@ -47,7 +47,7 @@ router.post('/events', async (req, res) => {
     await newEvent.save();
     res.status(201).json({ success: true, data: newEvent });
   } catch (err) {
-    res.status(500).json({ success: false, message: 'Error creating event' });
+    res.status(500).json({ success: false, message: `Error creating event: ${err.message}` });
   }
 });
 

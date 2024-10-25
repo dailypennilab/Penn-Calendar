@@ -1,11 +1,13 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const cors = require('cors');
 const authRoutes = require('./routes/authRoutes'); // Import authentication routes
 const studentRoutes = require('./routes/studentRoutes');
 const orgRoutes = require('./routes/orgRoutes')
 const eventRoutes = require('./routes/eventRoutes')
 
 const app = express();
+app.use(cors());
 app.use(express.json()); // Middleware to parse JSON requests
 
 // MongoDB connection
