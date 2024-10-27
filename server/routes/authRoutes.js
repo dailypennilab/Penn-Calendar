@@ -51,9 +51,11 @@ router.post('/login', async (req, res) => {
   try {
     let user;
     if (login.type === 'student') {
-      user = await Student.findOne({ login.email });
+      let email1 = login.email;
+      user = await Student.findOne({ email: email1 });
     } else if (login.type === 'org') {
-      user = await Org.findOne({ login.email });
+      let email1 = login.email;
+      user = await Org.findOne({ email: email1 });
     }
 
     if (!user) {
