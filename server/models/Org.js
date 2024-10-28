@@ -28,16 +28,4 @@ const OrgSchema = new mongoose.Schema({
   }
 });
 
-// Pre-save hook to hash password before saving
-OrgSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) return next(); // Only hash if the password field is modified
-  try {
-    const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
-    next();
-  } catch (err) {
-    next(err);
-  }
-});
-
 module.exports = mongoose.model('Org', OrgSchema);

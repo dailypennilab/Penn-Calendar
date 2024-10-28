@@ -1,97 +1,84 @@
 import React, { useState } from 'react';
-import { TextField, Button, Typography, Container, MenuItem, Select, FormControl, InputLabel, Link } from '@mui/material';
+import { TextField, Button, Typography, Container, MenuItem, Select, FormControl, InputLabel, Link, Box } from '@mui/material';
 import axios from 'axios';
 
 const Login = () => {
-  const [loginData, setLoginData] = useState({
-    email: '',
-    password: '',
-    type: 'student',
-  });
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [type, setType] = useState('student');
   const [message, setMessage] = useState('');
-
-  const handleChange = (e) => {
-    setLoginData({
-      ...loginData,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const toggleType = () => {
-    setLoginData({
-      ...loginData,
-      type: loginData.type === 'student' ? 'org' : 'student',
-    });
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:5038/login', loginData);
-      console.log(response.data.data);
-      // Redirect or show success message as per response
+      const response = await axios.post('http://localhost:5038/login', { email, password, type });
+      console.log(response.data.message);
+      setMessage("Successful login");
     } catch (err) {
-      setMessage(err.message || 'Login failed. Please check your credentials and try again.');
+      setMessage(JSON.stringify(err));
     }
   };
 
   return (
-    <Container maxWidth="sm">
-      <Typography variant="h4" component="h1" gutterBottom>
-        Login
-      </Typography>
-      <form onSubmit={handleSubmit}>
-        <TextField
-          label="Email"
-          name="email"
-          value={loginData.email}
-          onChange={handleChange}
-          fullWidth
-          required
-          margin="normal"
-          type="email"
-        />
-        
-        <TextField
-          label="Password"
-          name="password"
-          value={loginData.password}
-          onChange={handleChange}
-          fullWidth
-          required
-          margin="normal"
-          type="password"
-        />
-        
-        <FormControl fullWidth required margin="normal">
-          <InputLabel>Login As</InputLabel>
-          <Select
-            name="type"
-            value={loginData.type}
-            onChange={handleChange}
+    <Container maxWidth="xs">
+      <Box sx={{ mt: 8, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <Typography component="h1" variant="h5">Login</Typography>
+        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            id="email"
+            label="Email Address"
+            name="email"
+            autoComplete="email"
+            autoFocus
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            name="password"
+            label="Password"
+            type="password"
+            id="password"
+            autoComplete="current-password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <FormControl fullWidth margin="normal">
+            <InputLabel id="type-label">Type</InputLabel>
+            <Select
+              labelId="type-label"
+              id="type"
+              value={type}
+              label="Type"
+              onChange={(e) => setType(e.target.value)}
+            >
+              <MenuItem value="student">Student</MenuItem>
+              <MenuItem value="org">Organization</MenuItem>
+            </Select>
+          </FormControl>
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            color="primary"
+            sx={{ mt: 3, mb: 2 }}
           >
-            <MenuItem value="student">Student</MenuItem>
-            <MenuItem value="org">Organization</MenuItem>
-          </Select>
-        </FormControl>
-
-        <Link
-          component="button"
-          variant="body2"
-          onClick={toggleType}
-          sx={{ display: 'block', margin: '10px 0' }}
-        >
-          {loginData.type === 'student' ? "Not a student? Log in as an organization" : "Not an organization? Log in as a student"}
-        </Link>
-
-        <Button variant="contained" color="primary" type="submit">
-          Login
-        </Button>
-      </form>
-      {message && <Typography variant="body1" color="textSecondary">{message}</Typography>}
+            Login
+          </Button>
+          {message && (
+            <Typography variant="body2" color="error">
+              {message}
+            </Typography>
+          )}
+        </Box>
+      </Box>
     </Container>
   );
 };
-
 
 export default Login;
