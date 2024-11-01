@@ -1,8 +1,12 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const dotenv = require('dotenv');
 const Student = require('../models/Student'); // Adjust paths as needed
 const Org = require('../models/Org');
 const router = express.Router();
+
+dotenv.config();
 
 // Student registration
 router.post('/register/student', async (req, res) => {
@@ -50,25 +54,32 @@ router.post('/login', async (req, res) => {
 
   try {
     let user;
+    let type = login.type;
+    let email = login.email;
+    let password = login.password;
+
     if (login.type === 'student') {
-      let email1 = login.email;
-      user = await Student.findOne({ email: email1 });
+      user = await Student.findOne({ email: email });
     } else if (login.type === 'org') {
-      let email1 = login.email;
-      user = await Org.findOne({ email: email1 });
+      user = await Org.findOne({ email: email });
     }
 
     if (!user) {
       return res.status(400).json({ success: false, message: 'User not found' });
     }
 
-    const isMatch = await bcrypt.compare(login.password, user.password);
+    const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(400).json({ success: false, message: 'Invalid credentials' });
     }
 
-    // Successful login
-    res.status(200).json({ success: true, message: `${login.type} logged in successfully`});
+    const token = jwt.sign(
+      { id: user._id, type, name: user.name },
+      process.env.JWT_SECRET,
+      { expiresIn: '1h' }
+    );
+    console.log('token!!');
+    res.status(200).json({ success: true, token: token, user: { id: user._id, name: user.name, type: type }, message: `${type} logged in successfully`});
   } catch (err) {
     res.status(500).json({ success: false, message: `Error logging in: ${err.message}` });
     console.log(JSON.stringify(err))

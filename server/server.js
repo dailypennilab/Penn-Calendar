@@ -1,18 +1,20 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const dotenv = require('dotenv');
 const authRoutes = require('./routes/authRoutes'); // Import authentication routes
 const studentRoutes = require('./routes/studentRoutes');
-const orgRoutes = require('./routes/orgRoutes')
-const eventRoutes = require('./routes/eventRoutes')
+const orgRoutes = require('./routes/orgRoutes');
+const eventRoutes = require('./routes/eventRoutes');
 
 const app = express();
 app.use(cors());
 app.use(express.json()); // Middleware to parse JSON requests
 
+dotenv.config();
+
 // MongoDB connection
-const CONNECTION_STRING = "mongodb+srv://ilabmanager:n7VkZ0SoHEjmQlBw@penncalendar.rjlgg.mongodb.net/calendardb?retryWrites=true&w=majority&appName=PennCalendar";
-mongoose.connect(CONNECTION_STRING)
+mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('Connected to MongoDB'))
   .catch(err => console.error('Error connecting to MongoDB:', err));
 

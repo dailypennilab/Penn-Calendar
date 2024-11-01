@@ -8,7 +8,7 @@ const Register = () => {
     name: '',
     email: '',
     password: '',
-    orgType: 'student organization',
+    orgType: 'student_org',
   });
   const [message, setMessage] = useState('');
 
@@ -68,7 +68,7 @@ const Register = () => {
               onChange={handleChange}
               required
             >
-              <MenuItem value="student organization">Student Organization</MenuItem>
+              <MenuItem value="student_org">Student Organization</MenuItem>
               <MenuItem value="company">Company</MenuItem>
             </Select>
           </FormControl>

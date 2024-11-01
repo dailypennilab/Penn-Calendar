@@ -1,21 +1,25 @@
 import React, { useState } from 'react';
 import { TextField, Button, Typography, Container, MenuItem, Select, FormControl, InputLabel, Link, Box } from '@mui/material';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/authContext';
 
 const Login = () => {
+  const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [type, setType] = useState('student');
   const [message, setMessage] = useState('');
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:5038/login', { email, password, type });
-      console.log(response.data.message);
-      setMessage("Successful login");
+      await login({ email, password, type });
+      navigate('/');
     } catch (err) {
-      setMessage(JSON.stringify(err));
+      console.error(`Login failed: ${JSON.stringify(err)}`)
+      setMessage('Error logging in.');
     }
   };
 
