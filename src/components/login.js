@@ -23,17 +23,21 @@ const Login = () => {
     }
   };
 
+
   return (
     <Container maxWidth="xs">
       <Box sx={{ mt: 8, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-        <Typography component="h1" variant="h5">Login</Typography>
+        <Box sx={{ mb: 4, display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
+          <Typography component="h1" variant="h4" sx={{ fontWeight: 'bold', mr: 2 }}>Penn Calendar</Typography>
+          <img src="logo-url-here" alt="Logo" style={{ width: 40, height: 40 }} />
+        </Box>
         <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
           <TextField
             margin="normal"
             required
             fullWidth
             id="email"
-            label="Email Address"
+            label="Email"
             name="email"
             autoComplete="email"
             autoFocus
@@ -65,6 +69,10 @@ const Login = () => {
               <MenuItem value="org">Organization</MenuItem>
             </Select>
           </FormControl>
+          <FormControlLabel
+            control={<Checkbox checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} />}
+            label="Remember me"
+          />
           <Button
             type="submit"
             fullWidth
@@ -79,6 +87,9 @@ const Login = () => {
               {message}
             </Typography>
           )}
+          <Link href="/register" variant="body2" sx={{ display: 'block', textAlign: 'center', mt: 2 }}>
+            Register now!
+          </Link>
         </Box>
       </Box>
     </Container>
