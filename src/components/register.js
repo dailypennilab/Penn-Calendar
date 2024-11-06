@@ -46,10 +46,57 @@ const Register = () => {
 
   return (
     <Container maxWidth="sm">
-      <Typography variant="h4" component="h1" gutterBottom>
+      <Box
+        sx={{
+          backgroundColor: '#f8e8e8',
+          padding: '16px',
+          borderRadius: '8px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '24px',
+        }}
+      >
+        <Typography variant="h4" component="h1">
+          Penn Calendar
+        </Typography>
+        <img src="path-to-your-logo.png" alt="Logo" style={{ height: '40px' }} />
+      </Box>
+
+      <Typography variant="h6" component="h2" gutterBottom>
         {isStudentForm ? 'Register as a Student' : 'Register as an Organization'}
       </Typography>
+
       <form onSubmit={handleSubmit}>
+        <TextField
+          label="Email"
+          name="email"
+          value={formData.email}
+          onChange={handleChange}
+          fullWidth
+          required
+          margin="normal"
+        />
+        <TextField
+          label="Password"
+          name="password"
+          type="password"
+          value={formData.password}
+          onChange={handleChange}
+          fullWidth
+          required
+          margin="normal"
+        />
+        <TextField
+          label="Confirm Password"
+          name="confirmPassword"
+          type="password"
+          value={formData.confirmPassword}
+          onChange={handleChange}
+          fullWidth
+          required
+          margin="normal"
+        />
         <TextField
           label="Name"
           name="name"
@@ -73,30 +120,13 @@ const Register = () => {
             </Select>
           </FormControl>
         )}
-        <TextField
-          label="Email"
-          name="email"
-          value={formData.email}
-          onChange={handleChange}
-          fullWidth
-          required
-          margin="normal"
-        />
-        <TextField
-          label="Password"
-          name="password"
-          type="password"
-          value={formData.password}
-          onChange={handleChange}
-          fullWidth
-          required
-          margin="normal"
-        />
         <Button variant="contained" color="primary" type="submit" fullWidth>
-          Submit
+          Register
         </Button>
       </form>
+
       {message && <Typography variant="body1" color="textSecondary">{message}</Typography>}
+
       <Typography
         variant="body2"
         color="primary"
