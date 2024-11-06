@@ -17,9 +17,8 @@ const EventSchema = new mongoose.Schema({
     required: true,
   },
   description: String,
-  qualifications: String,
   registrationForm: String,
-  gcalInvite: String,
+  imageUrl: String,
 });
 
 module.exports = mongoose.model('Event', EventSchema);

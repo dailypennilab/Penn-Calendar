@@ -1,7 +1,7 @@
-// src/components/EventDetails.js
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
+import { Box, Card, CardContent, Typography, Button, CircularProgress } from '@mui/material';
 
 const EventDetails = () => {
   const { eventId } = useParams(); // Extract the eventId from the URL
@@ -20,16 +20,53 @@ const EventDetails = () => {
   }, [eventId]);
 
   if (!event) {
-    return <p>Loading event details...</p>;
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
+        <CircularProgress />
+      </Box>
+    );
   }
 
   return (
-    <div>
-      <h1>{event.name}</h1>
-      <p>Organizer: {event.organizer}</p>
-      <p>Date and Time: {new Date(event.time).toLocaleString()}</p>
-      <p>Description: {event.description}</p>
-    </div>
+    <Box sx={{ padding: '20px', display: 'flex', justifyContent: 'center' }}>
+      <Card sx={{ maxWidth: 600 }}>
+        {/* Event Image */}
+        <img
+          src={event.imageUrl || 'default-image.jpg'}
+          alt={event.name}
+          style={{ width: '100%', height: 'auto', borderRadius: '4px 4px 0 0' }}
+        />
+
+        {/* Event Details */}
+        <CardContent>
+          <Typography variant="h4" component="div" gutterBottom>
+            {event.name}
+          </Typography>
+
+          <Typography variant="body1" color="textSecondary">
+            Organizer: {event.organizer}
+          </Typography>
+
+          <Typography variant="body1" color="textSecondary">
+            Date and Time: {new Date(event.time).toLocaleString()}
+          </Typography>
+
+          <Typography variant="body2" color="textSecondary" paragraph>
+            {event.description}
+          </Typography>
+
+          {/* Action Buttons */}
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px' }}>
+            <Button variant="contained" color="primary">
+              Invite Friends
+            </Button>
+            <Button variant="contained" color="secondary">
+              Register Now
+            </Button>
+          </Box>
+        </CardContent>
+      </Card>
+    </Box>
   );
 };
 
