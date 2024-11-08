@@ -37,7 +37,6 @@ router.get('/events/:eventId', async (req, res) => {
 // Add a new event
 router.post('/events', async (req, res) => {
   const event = req.body;
-  console.log(event.organizer);
 
   // might have to do different validation for organizer and time ?
   if (!event.organizer || !event.name || !event.time) {
@@ -45,24 +44,17 @@ router.post('/events', async (req, res) => {
   }
 
   try {
-    console.log('in??');
-    console.log(JSON.stringify(event));
     const newEvent = new Event(event);
     await newEvent.save();
-    console.log(newEvent);
-    console.log('saved??');
 
     const organizer = await Org.findById(newEvent.organizer);
-    console.log('org found');
-    console.log(organizer);
+
     if (!organizer) {
       return res.status(404).json({ success: false, message: "Organizer not found" });
     }
-    console.log('past not');
+
     organizer.events.push(newEvent);
-    console.log('pushed');
     await organizer.save();
-    console.log('saved');
 
     res.status(201).json({ success: true, data: newEvent });
   } catch (err) {

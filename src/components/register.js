@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TextField, Button, Typography, Container, MenuItem, Select, FormControl, InputLabel } from '@mui/material';
+import { TextField, Button, Typography, Container, Box, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import axios from 'axios';
 
 const Register = () => {
@@ -8,7 +8,7 @@ const Register = () => {
     name: '',
     email: '',
     password: '',
-    orgType: 'student_org',
+    orgType: ''
   });
   const [message, setMessage] = useState('');
 
@@ -35,39 +35,51 @@ const Register = () => {
 
   const toggleForm = () => {
     setIsStudentForm(!isStudentForm);
-    setFormData({
-      name: '',
-      email: '',
-      password: '',
-      orgType: 'student organization',
-    });
     setMessage('');
   };
 
   return (
-    <Container maxWidth="sm">
-      <Box
-        sx={{
-          backgroundColor: '#f8e8e8',
-          padding: '16px',
-          borderRadius: '8px',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: '24px',
-        }}
-      >
-        <Typography variant="h4" component="h1">
-          Penn Calendar
+    <Container maxWidth="sm" sx={{ backgroundColor: '#dbabad', padding: '40px', borderRadius: '10px', marginTop: '40px' }}>
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '20px' }}>
+        <Typography variant="h5" component="h1" sx={{ fontWeight: 'bold' }}>
+          {isStudentForm ? 'Register as Student' : 'Register as Organization'}
         </Typography>
-        <img src="path-to-your-logo.png" alt="Logo" style={{ height: '40px' }} />
       </Box>
-
-      <Typography variant="h6" component="h2" gutterBottom>
-        {isStudentForm ? 'Register as a Student' : 'Register as an Organization'}
-      </Typography>
-
+      
       <form onSubmit={handleSubmit}>
+        { !isStudentForm && (
+          <FormControl fullWidth margin="normal">
+          <InputLabel id="type-label">Organization Type</InputLabel>
+          <Select
+            labelId="type-label"
+            id="orgType"
+            name="orgType"
+            label="Organization Type"
+            value={formData.type}
+            onChange={handleChange}
+            sx={{
+              backgroundColor: '#f0f0f0',
+              color: '#000000',
+              '& .MuiSelect-select': {
+                color: '#000000',
+              },
+            }}
+          >
+            <MenuItem value="student_org" sx={{ color: '#000000'}}>Student Organization</MenuItem>
+            <MenuItem value="company" sx={{ color: '#000000'}}>Company</MenuItem>
+          </Select>
+          </FormControl>
+        )}
+        <TextField
+          label="Name"
+          name="name"
+          value={formData.name}
+          onChange={handleChange}
+          fullWidth
+          required
+          margin="normal"
+          sx={{ backgroundColor: '#f0f0f0', borderRadius: '5px' }}
+        />
         <TextField
           label="Email"
           name="email"
@@ -76,6 +88,7 @@ const Register = () => {
           fullWidth
           required
           margin="normal"
+          sx={{ backgroundColor: '#f0f0f0', borderRadius: '5px' }}
         />
         <TextField
           label="Password"
@@ -86,54 +99,52 @@ const Register = () => {
           fullWidth
           required
           margin="normal"
+          sx={{ backgroundColor: '#f0f0f0', borderRadius: '5px' }}
         />
-        <TextField
-          label="Confirm Password"
-          name="confirmPassword"
-          type="password"
-          value={formData.confirmPassword}
-          onChange={handleChange}
+
+        {/* Register Button */}
+        <Button
+          variant="contained"
+          type="submit"
           fullWidth
-          required
-          margin="normal"
-        />
-        <TextField
-          label="Name"
-          name="name"
-          value={formData.name}
-          onChange={handleChange}
-          fullWidth
-          required
-          margin="normal"
-        />
-        {!isStudentForm && (
-          <FormControl fullWidth margin="normal">
-            <InputLabel>Organization Type</InputLabel>
-            <Select
-              name="orgType"
-              value={formData.orgType}
-              onChange={handleChange}
-              required
-            >
-              <MenuItem value="student_org">Student Organization</MenuItem>
-              <MenuItem value="company">Company</MenuItem>
-            </Select>
-          </FormControl>
-        )}
-        <Button variant="contained" color="primary" type="submit" fullWidth>
+          onClick={handleSubmit}
+          sx={{
+            marginTop: '20px',
+            padding: '10px',
+            backgroundColor: '#a9a9a9',
+            color: '#000000',
+            fontWeight: 'bold',
+            '&:hover': { backgroundColor: '#888888' },
+            borderRadius: '20px',
+            boxShadow: 'none',
+            textTransform: 'none',
+            fontSize: '16px',
+          }}
+        >
           Register
         </Button>
       </form>
 
-      {message && <Typography variant="body1" color="textSecondary">{message}</Typography>}
+      {/* Message */}
+      {message && (
+        <Typography variant="body1" color="textSecondary" sx={{ marginTop: '20px' }}>
+          {message}
+        </Typography>
+      )}
 
+      {/* Toggle Form Type */}
       <Typography
         variant="body2"
         color="primary"
         onClick={toggleForm}
-        style={{ marginTop: '16px', cursor: 'pointer' }}
+        sx={{
+          marginTop: '20px',
+          cursor: 'pointer',
+          textAlign: 'center',
+          fontWeight: 'bold',
+        }}
       >
-        {isStudentForm ? 'Not a student? Register an organization.' : 'Not an organization? Register a student.'}
+        {isStudentForm ? "Not a student? Register as an organization." : "Not an organization? Register as a student."}
       </Typography>
     </Container>
   );

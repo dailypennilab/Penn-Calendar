@@ -8,11 +8,7 @@ import {
   Card,
   CardContent,
   Button,
-  Avatar,
-  IconButton,
 } from '@mui/material';
-// import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
-// import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import axios from 'axios';
 
 const Home = () => {
@@ -32,34 +28,15 @@ const Home = () => {
       }
     };
     fetchEvents();
-  }, []);
+  });
 
   const formatDate = (dateString) => {
-    const options = { month: 'short', day: 'numeric', year: 'numeric' };
+    const options = { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric' };
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
-
-  // return (
-  //   <div>
-  //     <h1>Event List</h1>
-  //     {events.length > 0 ? (
-  //       events.map(event => (
-  //         <div key={event._id} style={{ margin: '10px 0' }}>
-  //           <h2>{event.name}</h2>
-  //           <p>{event.description}</p>
-  //           <Link to={`/events/${event._id}`}>
-  //             <button>View Event</button>
-  //           </Link>
-  //         </div>
-  //       ))
-  //     ) : (
-  //       <p>No events available</p>
-  //     )}
-  //   </div>
-  // );
-
-  return (
+return (
+  <Box sx={{ backgroundColor: '#dbabad' }}>
     <Box sx={{ padding: '20px' }}>
       {/* Header Section */}
       <Grid container justifyContent="center" alignItems="center">
@@ -78,19 +55,34 @@ const Home = () => {
           events.map(event => (
             <Grid item xs={12} sm={6} md={4} key={event._id}>
               <Card sx={{ height: '100%' }}>
-                {/* Replace with event image if available */}
+                {/* Event Image */}
                 <img
-                  src={event.imageURL || "https://via.placeholder.com/300"}
+                  src={event.imageUrl || "https://via.placeholder.com/300"}
                   alt={event.name}
                   style={{ width: "100%", height: "200px", objectFit: "cover" }}
                 />
                 <CardContent>
-                  <Typography variant="h6">{event.name}</Typography>
+                  {/* Event Type */}
+                  <Typography variant="body2" color="textSecondary">
+                    Event Type: {event.type || "General"}
+                  </Typography>
+
+                  {/* Event Title as a Link */}
+                  <Typography variant="h6">
+                    <Link to={`/events/${event._id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                      {event.name}
+                    </Link>
+                  </Typography>
+
+                  {/* Event Description */}
                   <Typography variant="body2">{event.description}</Typography>
+
+                  {/* Event Date and Time */}
                   <Typography variant="body2" color="textSecondary" sx={{ marginTop: '10px' }}>
                     {formatDate(event.time)}
                   </Typography>
-                  {/* Link to event details */}
+
+                  {/* View Event Link */}
                   <Link to={`/events/${event._id}`}>
                     <Button variant="contained" color="primary" sx={{ marginTop: '10px' }}>
                       View Event
@@ -105,7 +97,8 @@ const Home = () => {
         )}
       </Grid>
     </Box>
-  );
+  </Box>
+);
 };
 
 export default Home;

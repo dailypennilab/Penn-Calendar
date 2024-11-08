@@ -1,5 +1,3 @@
-import logo from './logo.svg';
-import './App.css';
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import EventRegistrationForm from './components/createEvent';
@@ -11,6 +9,8 @@ import EventDetails from './components/eventDetails';
 import Profile from './components/profile';
 import { AuthProvider } from './context/authContext';
 import { ProtectedRoute } from './components/protectedRoute';
+import Footer from './components/footer';
+import './App.css';  /* Make sure to import your CSS file */
 
 function App() {
   return (
@@ -31,6 +31,7 @@ function App() {
                 <ProtectedRoute> <Profile /> </ProtectedRoute>
             } />
           </Routes>
+          <Footer />
         </div>
       </Router>
     </AuthProvider>

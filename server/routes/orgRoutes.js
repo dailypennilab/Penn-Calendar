@@ -78,14 +78,13 @@ router.delete('/organizations/:orgId', async (req, res) => {
 
 router.get('/organizations/:orgId/events', async (req, res) => {
   const { orgId } = req.params;
-  console.log(orgId);
+
   if (!mongoose.Types.ObjectId.isValid(orgId)) {
     return res.status(404).json({ success: false, message: "Invalid Org ID" });
   }
 
   try {
     const organization = await Org.findById(orgId).populate('events');
-    console.log(organization);
 
     if (!organization) {
       return res.status(404).json({ success: false, message: 'Organization not found' });

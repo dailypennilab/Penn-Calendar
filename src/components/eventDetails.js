@@ -2,10 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { Box, Card, CardContent, Typography, Button, CircularProgress } from '@mui/material';
+import { useAuth } from '../context/authContext';
 
 const EventDetails = () => {
   const { eventId } = useParams(); // Extract the eventId from the URL
+  const { user } = useAuth();
   const [event, setEvent] = useState(null);
+  const [registrationMessage, setRegistrationMessage] = useState('');
 
   useEffect(() => {
     const fetchEventDetails = async () => {
@@ -18,6 +21,36 @@ const EventDetails = () => {
     };
     fetchEventDetails();
   }, [eventId]);
+
+  const handleRegister = async () => {
+    console.log(user);
+    if (!user || !user.id) {
+      setRegistrationMessage('Log in to register');
+      return;
+    }
+
+    if (user.type === 'org') {
+      setRegistrationMessage('Organization can not register for event');
+      return;
+    }
+
+    try {
+      const response = await axios.post(`http://localhost:5038/students/${user.id}/events/${eventId}/register`);
+
+      if (response.data.success) {
+        if (response.data.alreadyRegistered) {
+          setRegistrationMessage('Already registered for event');
+        } else {
+          setRegistrationMessage(`Successfully registered for ${event.name}`);
+        }
+      } else {
+        setRegistrationMessage(`Error during registration.`);
+      }
+    } catch (error) {
+      console.log(`Error registering for event: ${error}`);
+      setRegistrationMessage(`Error during registration. Please try again.`);
+    }
+  };
 
   if (!event) {
     return (
@@ -60,10 +93,16 @@ const EventDetails = () => {
             <Button variant="contained" color="primary">
               Invite Friends
             </Button>
-            <Button variant="contained" color="secondary">
+            <Button variant="contained" color="secondary" onClick={handleRegister}>
               Register Now
             </Button>
           </Box>
+
+          {registrationMessage && (
+            <Typography variant="body2" color="success.main" sx={{ marginTop: '10px' }}>
+              {registrationMessage}
+            </Typography>
+          )}
         </CardContent>
       </Card>
     </Box>

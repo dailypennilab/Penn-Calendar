@@ -69,11 +69,14 @@ router.get('/students/:studentId/events', async (req, res) => {
   }
 
   try {
-    const student = await Student.findById(studentId).populate('events');
+    // const student = await Student.findById(studentId).populate('events');
+    const student = await Student.findById(studentId).populate('registeredEvents');
+
     if (!student) {
       return res.status(404).json({ success: false, message: 'Student not found' });
     }
-    res.status(200).json({ success: true, data: student.events });
+
+    res.status(200).json({ success: true, data: student.registeredEvents });
   } catch (err) {
     res.status(500).json({ success: false, message: 'Error fetching student events' });
   }
@@ -92,7 +95,8 @@ router.post('/students/:studentId/events/:eventId/register', async (req, res) =>
   }
 
   try {
-    const student = await Student.findById(studentId).populate('events');
+    // const student = await Student.findById(studentId).populate('events');
+    const student = await Student.findById(studentId);
     const event = await Event.findById(eventId);
 
     if (!student) {
@@ -103,7 +107,15 @@ router.post('/students/:studentId/events/:eventId/register', async (req, res) =>
       return res.status(404).json({ success: false, message: 'Event not found' });
     }
 
-    student.events.push(event);
+    const alreadyRegistered = student.registeredEvents.some(
+      (event) => event.toString() === eventId
+    );
+
+    if (alreadyRegistered) {
+      return res.status(200).json({ success: true, alreadyRegistered: true, message: 'Already registered for event' });
+    }
+
+    student.registeredEvents.push(event);
     const newStudent = await Student.findByIdAndUpdate(studentId, student, { new: true });
 
     res.status(200).json({ success: true, data: newStudent });
@@ -115,7 +127,7 @@ router.post('/students/:studentId/events/:eventId/register', async (req, res) =>
 // Unregister student from an event
 router.delete('/students/:studentId/events/:eventId', async (req, res) => {
   const { studentId, eventId } = req.params;
-
+c
   if (!mongoose.Types.ObjectId.isValid(studentId)) {
     return res.status(404).json({ success: false, message: "Invalid Student ID" });
   }
@@ -137,11 +149,12 @@ router.delete('/students/:studentId/events/:eventId', async (req, res) => {
     }
 
     // Remove event from student's events
-    student.events = student.events.filter(e => e.equals(event));
+    student.registeredEvents = student.registeredEvents.filter(e => e.equals(event));
     const newStudent = await Student.findByIdAndUpdate(studentId, student, { new: true });
 
     res.status(200).json({ success: true, data: newStudent });
   } catch (err) {
+    console.log(err);
     res.status(500).json({ success: false, message: 'Error unregistering from the event' });
   }
 });

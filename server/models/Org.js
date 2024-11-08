@@ -11,7 +11,6 @@ const OrgSchema = new mongoose.Schema({
     enum: ['student_org', 'company'],
     required: true,
   },
-  typeOfOrg: String,
   email: {
     type: String,
     required: true,
