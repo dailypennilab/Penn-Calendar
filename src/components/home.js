@@ -2,14 +2,11 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  Box,
-  Grid,
   Typography,
-  Card,
-  CardContent,
   Button,
 } from '@mui/material';
 import axios from 'axios';
+import styled from 'styled-components';
 
 const Home = () => {
   const [events, setEvents] = useState([]);
@@ -28,77 +25,112 @@ const Home = () => {
       }
     };
     fetchEvents();
-  });
+  }, []);
 
   const formatDate = (dateString) => {
     const options = { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric' };
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
-return (
-  <Box sx={{ backgroundColor: '#dbabad' }}>
-    <Box sx={{ padding: '20px' }}>
-      {/* Header Section */}
-      <Grid container justifyContent="center" alignItems="center">
-        <Grid item textAlign="center">
-          <Typography variant="h4">Welcome</Typography>
-          <Typography variant="subtitle1">How is your day today?</Typography>
-        </Grid>
-      </Grid>
+  return (
+    <Container>
+      <Header>
+        <Typography variant="h4">Welcome</Typography>
+        <Typography variant="subtitle1">How is your day today?</Typography>
+      </Header>
 
-      {/* Upcoming Events Section */}
-      <Typography variant="h5" sx={{ marginTop: '30px', marginBottom: '10px' }}>Upcoming Events</Typography>
+      <SectionTitle variant="h5">Upcoming Events</SectionTitle>
 
-      {/* Event Cards */}
-      <Grid container spacing={2}>
+      <EventsGrid>
         {events.length > 0 ? (
           events.map(event => (
-            <Grid item xs={12} sm={6} md={4} key={event._id}>
-              <Card sx={{ height: '100%' }}>
-                {/* Event Image */}
-                <img
-                  src={event.imageUrl || "https://via.placeholder.com/300"}
-                  alt={event.name}
-                  style={{ width: "100%", height: "200px", objectFit: "cover" }}
-                />
-                <CardContent>
-                  {/* Event Type */}
-                  <Typography variant="body2" color="textSecondary">
-                    Event Type: {event.type || "General"}
-                  </Typography>
-
-                  {/* Event Title as a Link */}
-                  <Typography variant="h6">
-                    <Link to={`/events/${event._id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                      {event.name}
-                    </Link>
-                  </Typography>
-
-                  {/* Event Description */}
-                  <Typography variant="body2">{event.description}</Typography>
-
-                  {/* Event Date and Time */}
-                  <Typography variant="body2" color="textSecondary" sx={{ marginTop: '10px' }}>
-                    {formatDate(event.time)}
-                  </Typography>
-
-                  {/* View Event Link */}
-                  <Link to={`/events/${event._id}`}>
-                    <Button variant="contained" color="primary" sx={{ marginTop: '10px' }}>
-                      View Event
-                    </Button>
-                  </Link>
-                </CardContent>
-              </Card>
-            </Grid>
+            <EventCard key={event._id}>
+              <EventImage src={event.imageUrl || "https://via.placeholder.com/300"} alt={event.name} />
+              <EventContent>
+                <Typography variant="body2" color="textSecondary">
+                  Event Type: {event.type || "General"}
+                </Typography>
+                <EventTitle variant="h6">
+                  <StyledLink to={`/events/${event._id}`}>{event.name}</StyledLink>
+                </EventTitle>
+                <Typography variant="body2">{event.description}</Typography>
+                <Typography variant="body2" color="textSecondary" sx={{ marginTop: '10px' }}>
+                  {formatDate(event.time)}
+                </Typography>
+                <StyledLink to={`/events/${event._id}`}>
+                  <ViewButton variant="contained" color="primary">View Event</ViewButton>
+                </StyledLink>
+              </EventContent>
+            </EventCard>
           ))
         ) : (
           <Typography>No events available</Typography>
         )}
-      </Grid>
-    </Box>
-  </Box>
-);
+      </EventsGrid>
+    </Container>
+  );
 };
 
 export default Home;
+
+// Styled Components
+const Container = styled.div`
+  background-color: #dbabad;
+  padding: 20px;
+`;
+
+const Header = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+`;
+
+const SectionTitle = styled(Typography)`
+  margin-top: 30px;
+  margin-bottom: 10px;
+`;
+
+const EventsGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+`;
+
+const EventCard = styled.div`
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  overflow: hidden;
+`;
+
+const EventImage = styled.img`
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+`;
+
+const EventContent = styled.div`
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+`;
+
+const EventTitle = styled(Typography)`
+  margin-top: 8px;
+  text-decoration: none;
+  color: inherit;
+`;
+
+const StyledLink = styled(Link)`
+  text-decoration: none;
+  color: inherit;
+`;
+
+const ViewButton = styled(Button)`
+  margin-top: 10px;
+`;
+
