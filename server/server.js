@@ -11,7 +11,7 @@ const app = express();
 app.use(cors());
 app.use(express.json()); // Middleware to parse JSON requests
 
-dotenv.config();
+dotenv.config({path:"Penn-Calendar"+'/.env'});
 
 // MongoDB connection
 mongoose.connect(process.env.MONGO_URI)

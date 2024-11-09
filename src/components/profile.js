@@ -5,7 +5,7 @@ import { Card, CardContent, Button, Typography, Grid } from '@mui/material';
 import { Link } from 'react-router-dom';
 
 const Profile = () => {
-  const { user, setUser } = useAuth();
+  const { user } = useAuth();
   const [events, setEvents] = useState([]);
 
   useEffect(() => {
@@ -50,7 +50,7 @@ const Profile = () => {
 
   const unregisterEvent = async (eventId) => {
     try {
-      let response = await axios.delete(`http://localhost:5038/students/${user.id}/events/${eventId}`);
+      await axios.delete(`http://localhost:5038/students/${user.id}/events/${eventId}`);
       setEvents(events.filter(event => event._id !== eventId));
     } catch (error) {
       console.error(`Error unregistering from event: ${error}`);
@@ -63,71 +63,84 @@ const Profile = () => {
   };
 
   return (
-    <div>
-      <h1>Profile</h1>
-      <h2>Welcome, {user.name}!</h2>
+    <div style={{ padding: '20px' }}>
+      <Typography variant="h4" gutterBottom>
+        Profile
+      </Typography>
+      <Typography variant="h5" gutterBottom>
+        Welcome, {user.name}!
+      </Typography>
 
       <div>
-        <h3>Your Events</h3>
-        <Grid container spacing={2}>
+        <Typography variant="h6" gutterBottom>
+          Your Events
+        </Typography>
+        <Grid container spacing={2} justifyContent="center">
           {events.length > 0 ? (
             events.map(event => (
               <Grid item xs={12} sm={6} md={4} key={event._id}>
-                <Card sx={{ height: '100%' }}>
+                <Card
+                  sx={{
+                    maxWidth: '350px',
+                    margin: '0 auto',
+                    backgroundColor: '#333',
+                    color: '#fff',
+                    borderRadius: '10px',
+                    boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)',
+                    transition: 'background-color 0.3s ease', // Smooth transition for hover effect
+                    '&:hover': {
+                      backgroundColor: '#8B0000', // Darker red on hover
+                    },
+                  }}
+                >
                   {/* Event Image */}
                   <img
                     src={event.imageUrl || "https://via.placeholder.com/300"}
                     alt={event.name}
-                    style={{ width: "100%", height: "200px", objectFit: "cover" }}
+                    style={{ width: "100%", height: "150px", objectFit: "cover", borderRadius: '10px 10px 0 0' }}
                   />
-                  <CardContent>
+                  <CardContent sx={{ paddingBottom: '16px' }}>
+                    {/* Event Title */}
+                    <Typography variant="h6" gutterBottom style={{ fontWeight: 'bold', color: '#fff' }}>
+                      {event.name}
+                    </Typography>
+
                     {/* Event Type */}
                     <Typography variant="body2" color="textSecondary">
                       Event Type: {event.type || "General"}
                     </Typography>
 
-                    {/* Event Title as a Link */}
-                    <Typography variant="h6">
-                      <Link to={`/events/${event._id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                        {event.name}
-                      </Link>
-                    </Typography>
-
                     {/* Event Description */}
-                    <Typography variant="body2">{event.description}</Typography>
+                    <Typography variant="body2" color="textSecondary">
+                      {event.description}
+                    </Typography>
 
                     {/* Event Date and Time */}
                     <Typography variant="body2" color="textSecondary" sx={{ marginTop: '10px' }}>
                       {formatDate(event.time)}
                     </Typography>
 
-                    <div>
-                      <Link to={`/events/${event._id}`}>
-                        <Button variant="contained" color="primary" sx={{ marginTop: '10px', marginLeft: '10px' }}>
+                    {/* Single Button */}
+                    <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'center' }}>
+                      <Link to={`/events/${event._id}`} style={{ textDecoration: 'none', flexGrow: 1 }}>
+                        <Button
+                          variant="contained"
+                          sx={{
+                            backgroundColor: '#000',
+                            color: '#fff',
+                            width: '100%',
+                          }}
+                        >
                           View Event
                         </Button>
                       </Link>
-
-                      {/* Show Delete button only if user is an organizer */}
-                      {user.type === 'org' && (
-                        <Button variant="contained" color="secondary" sx={{ marginTop: '10px' }} onClick={() => deleteEvent(event._id)}>
-                          Delete Event
-                        </Button>
-                      )}
-
-                      {/* Show Unregister button only if user is a student */}
-                      {user.type === 'student' && (
-                        <Button variant="contained" color="secondary" sx={{ marginTop: '10px' }} onClick={() => unregisterEvent(event._id)}>
-                          Unregister Event
-                        </Button>
-                      )}
                     </div>
                   </CardContent>
                 </Card>
               </Grid>
             ))
           ) : (
-            <h4>No events available</h4>
+            <Typography variant="body1">No events available</Typography>
           )}
         </Grid>
       </div>
