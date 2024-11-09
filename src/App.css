@@ -1,6 +1,21 @@
 .App {
   text-align: center;
-  background-color: lightgray;
+  background: linear-gradient(135deg, #4f4f4f, #cfcfcf);
+  background-size: 200% 200%;
+  animation: shiftBackground 5s infinite alternate;
+}
+
+/* Keyframes for a shifting gradient effect */
+@keyframes shiftBackground {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 .App-logo {
@@ -47,8 +62,6 @@
 
 .footer {
   margin-top: auto;
-  background-color: #3f50b5;
   color: white;
-  padding: 20px;
   text-align: center;
 }

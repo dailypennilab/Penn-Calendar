@@ -1,4 +1,3 @@
-// src/components/Navbar.js
 import React from 'react';
 import { AppBar, Toolbar, Button, Container, Box } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
@@ -16,64 +15,59 @@ const Navbar = () => {
 
   return (
     <StyledAppBar position="static">
-      <Container maxWidth="lg">
+      <StyledContainer>
         <StyledToolbar>
-          {/* Logo on the left side */}
-          <Box sx={{ flexGrow: 1 }}>
-            <Link to="/" style={{ color: 'inherit', textDecoration: 'none' }}>
-              <Logo src="/dp_logo.png" alt="DP Logo" />
-            </Link>
-          </Box>
+          {/* Logo */}
+          <LogoLink to="/">
+            <Logo src="/dp_logo.png" alt="DP Logo" />
+          </LogoLink>
 
-          {/* Navigation Links in the center */}
-          <NavLinks>
-            <NavLink to="/events">Events</NavLink>
-            <NavLink to="/sponsors">Sponsors</NavLink>
-            <ExternalLink href="https://www.thedp.com" target="_blank" rel="noopener noreferrer">
-              Daily Pennsylvanian
-            </ExternalLink>
-          </NavLinks>
+          {/* Combined Navigation and Auth Container */}
+          <RightContainer>
+            {/* Navigation Items */}
+            <NavContainer>
+              <NavLink to="/events">Events</NavLink>
+              <NavLink to="/sponsors">Sponsors</NavLink>
+              <NavLink 
+                as="a" 
+                href="https://www.thedp.com" 
+                target="_blank" 
+                rel="noopener noreferrer"
+              >
+                Daily Pennsylvanian
+              </NavLink>
+            </NavContainer>
 
-          {/* Buttons on the right side */}
-          <Box sx={{ display: 'flex', gap: '10px' }}>
-            {isAuthenticated ? (
-              <>
-                <Button color="inherit">
-                  <Link to="/profile" style={{ color: 'inherit', textDecoration: 'none' }}>
-                    Profile
-                  </Link>
-                </Button>
-
-                {user.type === 'org' && (
-                  <Button color="inherit">
-                    <Link to="/create-event" style={{ color: 'inherit', textDecoration: 'none' }}>
+            {/* Auth Buttons */}
+            <AuthContainer>
+              {isAuthenticated ? (
+                <>
+                  {user.type === 'org' && (
+                    <ActionButton to="/create-event">
                       Create Event
-                    </Link>
-                  </Button>
-                )}
-
-                <StyledButton variant="contained" onClick={handleLogout}>
-                  Logout
-                </StyledButton>
-              </>
-            ) : (
-              <>
-                <StyledButton variant="outlined">
-                  <Link to="/login" style={{ color: 'inherit', textDecoration: 'none' }}>
+                    </ActionButton>
+                  )}
+                  <LoginButton to="/profile">
+                    Profile
+                  </LoginButton>
+                  <RegisterButton onClick={handleLogout}>
+                    Logout
+                  </RegisterButton>
+                </>
+              ) : (
+                <>
+                  <LoginButton to="/login">
                     Login
-                  </Link>
-                </StyledButton>
-
-                <StyledButton variant="contained">
-                  <Link to="/register" style={{ color: 'inherit', textDecoration: 'none' }}>
+                  </LoginButton>
+                  <RegisterButton to="/register">
                     Register
-                  </Link>
-                </StyledButton>
-              </>
-            )}
-          </Box>
+                  </RegisterButton>
+                </>
+              )}
+            </AuthContainer>
+          </RightContainer>
         </StyledToolbar>
-      </Container>
+      </StyledContainer>
     </StyledAppBar>
   );
 };
@@ -82,61 +76,119 @@ export default Navbar;
 
 // Styled Components
 const StyledAppBar = styled(AppBar)`
-  background-color: #808080;
-  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
+  background-color: #2f2f2f;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  width: 100%;
 `;
 
 const StyledToolbar = styled(Toolbar)`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  height: 64px;
+  background-color: #2f2f2f;
+  padding: 0 24px; // Add consistent padding
+`;
+
+// Update the Container styling
+const StyledContainer = styled(Container)`
+  && {
+    max-width: 100%;
+    padding: 0;
+    background-color: #2f2f2f;
+  }
+`;
+
+const LogoLink = styled(Link)`
+  display: flex;
+  align-items: center;
+  text-decoration: none;
 `;
 
 const Logo = styled.img`
-  height: 60px;
+  height: 52px;
 `;
 
-const NavLinks = styled(Box)`
+const RightContainer = styled.div`
   display: flex;
+  align-items: center;
+  gap: 3rem;
+`;
+
+const NavContainer = styled.div`
+  display: flex;
+  align-items: center;
   gap: 2rem;
 `;
 
 const NavLink = styled(Link)`
   color: #ffffff;
-  font-size: 1.2rem;
-  font-weight: 500;
-  text-decoration: none;
-  font-family: 'Arial', sans-serif;
-
-  &:hover {
-    color: #ffcc00;
-  }
-`;
-
-const ExternalLink = styled.a`
-  color: #ffffff;
-  font-size: 1.2rem;
-  font-weight: 500;
-  text-decoration: none;
-  font-family: 'Arial', sans-serif;
-
-  &:hover {
-    color: #ffcc00;
-  }
-`;
-
-const StyledButton = styled(Button)`
   font-size: 1rem;
-  padding: 0.5rem 1.5rem;
-  font-weight: 600;
+  font-weight: 500;
+  text-decoration: none;
+  font-family: 'Georgia', serif;
+  transition: color 0.2s ease;
+  white-space: nowrap;
+  letter-spacing: 0.5px;
 
   &:hover {
-    background-color: #ffcc00;
-    color: #000000;
+    color: #cccccc;
   }
+`;
 
-  &:first-of-type {
-    border-color: #ffffff;
-    color: #ffffff;
+const AuthContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+`;
+
+const LoginButton = styled(Link)`
+  background-color: #000000;
+  color: white;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 0.5rem 1.25rem;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  &:hover {
+    background-color: #6a6a6a;
+  }
+`;
+
+const RegisterButton = styled(Link)`
+  background-color: #8B0000;
+  color: white;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 0.5rem 1.25rem;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+  border: none;
+  cursor: pointer;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  &:hover {
+    background-color: #660000;
+  }
+`;
+
+const ActionButton = styled(Link)`
+  background-color: transparent;
+  color: white;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 0.5rem 1.25rem;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.1);
   }
 `;
