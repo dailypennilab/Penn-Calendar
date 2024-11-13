@@ -1,5 +1,15 @@
 import React, { useState } from 'react';
-import { TextField, Button, Typography, Container, MenuItem, InputLabel, FormControl, Select, Box } from '@mui/material';
+import {
+  TextField,
+  Button,
+  Typography,
+  Container,
+  MenuItem,
+  InputLabel,
+  FormControl,
+  Select,
+  Box
+} from '@mui/material';
 import axios from 'axios';
 import { useAuth } from '../context/authContext';
 
@@ -11,11 +21,13 @@ const EventRegistrationForm = () => {
     organizer: user.id,
     type: '',
     location: '',
-    time: '',
+    startTime: '',
+    endTime: '',
     description: '',
     qualifications: '',
     registrationForm: '',
     imageUrl: '',
+    featured: false
   });
 
   const [message, setMessage] = useState('');
@@ -29,11 +41,20 @@ const EventRegistrationForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
-      const response = await axios.post('http://localhost:5038/events', eventData);
+      // Converting startTime and endTime to ISO format for backend submission
+      const formattedEventData = {
+        ...eventData,
+        startTime: new Date(eventData.startTime).toISOString(),
+        endTime: new Date(eventData.endTime).toISOString(),
+      };
+
+      const response = await axios.post('http://localhost:5038/events', formattedEventData);
       setMessage(`Event "${response.data.data.name}" created successfully for user ${user.name}!`);
     } catch (error) {
       setMessage('Error creating event. Please try again.');
+      console.error("Error creating event:", error);
     }
   };
 
@@ -87,12 +108,28 @@ const EventRegistrationForm = () => {
           sx={{ backgroundColor: '#f0f0f0', borderRadius: '5px' }}
         />
 
-        {/* Time */}
+        {/* Start Time */}
         <TextField
-          label="Time"
-          name="time"
+          label="Start Time"
+          name="startTime"
           type="datetime-local"
-          value={eventData.time}
+          value={eventData.startTime}
+          onChange={handleChange}
+          fullWidth
+          required
+          InputLabelProps={{
+            shrink: true,
+          }}
+          margin="normal"
+          sx={{ backgroundColor: '#f0f0f0', borderRadius: '5px' }}
+        />
+
+        {/* End Time */}
+        <TextField
+          label="End Time"
+          name="endTime"
+          type="datetime-local"
+          value={eventData.endTime}
           onChange={handleChange}
           fullWidth
           required
@@ -160,4 +197,3 @@ const EventRegistrationForm = () => {
 };
 
 export default EventRegistrationForm;
-

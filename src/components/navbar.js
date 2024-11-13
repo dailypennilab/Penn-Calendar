@@ -1,5 +1,5 @@
 import React from 'react';
-import { AppBar, Toolbar, Button, Container, Box } from '@mui/material';
+import { AppBar, Toolbar, Container } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/authContext';
 import styled from 'styled-components';
@@ -26,8 +26,6 @@ const Navbar = () => {
           <RightContainer>
             {/* Navigation Items */}
             <NavContainer>
-              <NavLink to="/events">Events</NavLink>
-              <NavLink to="/sponsors">Sponsors</NavLink>
               <NavLink 
                 as="a" 
                 href="https://www.thedp.com" 

@@ -1,26 +1,34 @@
 // src/components/Home.js
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import axios from 'axios';
 import styled from 'styled-components';
+import Banner from './homeComponents/banner';
+import EventCard from './eventCard';
 
 const Home = () => {
   const [events, setEvents] = useState([]);
+  const [filteredEvents, setFilteredEvents] = useState([]);
+  const [featuredEvents, setFeaturedEvents] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [eventType, setEventType] = useState('');
+  const [afterDate, setAfterDate] = useState('');
+  const [beforeDate, setBeforeDate] = useState('');
 
   useEffect(() => {
     const fetchEvents = async () => {
       try {
         const response = await axios.get('http://localhost:5038/events');
-        
         const currentTime = new Date();
-        const bufferTime = new Date(currentTime.getTime() + 4 * 60 * 60 * 1000); // 4-hour buffer
-        
+
         const filteredEvents = response.data.data
-          .filter(event => new Date(event.time) > bufferTime)
-          .sort((a, b) => new Date(a.time) - new Date(b.time));
-          
-        console.log("Filtered Events after date restriction:", filteredEvents); // Log filtered events to check image URLs
+          .filter(event => new Date(event.endTime) > currentTime)
+          .sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
+
+        const featured = filteredEvents.filter(event => event.featured).slice(0, 3);
+
         setEvents(filteredEvents);
+        setFeaturedEvents(featured);
+        setFilteredEvents(filteredEvents);
       } catch (error) {
         console.error("Error fetching events:", error);
       }
@@ -28,40 +36,99 @@ const Home = () => {
     fetchEvents();
   }, []);
 
+  useEffect(() => {
+    const applyFilters = () => {
+      let filtered = events;
+
+      if (searchQuery) {
+        filtered = filtered.filter(event =>
+          event.name.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+      }
+
+      if (eventType) {
+        filtered = filtered.filter(event => event.type === eventType);
+      }
+
+      if (afterDate) {
+        const after = new Date(afterDate);
+        filtered = filtered.filter(event => new Date(event.startTime) >= after);
+      }
+
+      if (beforeDate) {
+        const before = new Date(beforeDate);
+        filtered = filtered.filter(event => new Date(event.startTime) <= before);
+      }
+
+      setFilteredEvents(filtered);
+    };
+
+    applyFilters();
+  }, [searchQuery, eventType, afterDate, beforeDate, events]);
+
   const formatDate = (dateString) => {
-    const options = { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric' };
-    return new Date(dateString).toLocaleDateString(undefined, options);
+    const date = new Date(dateString);
+    return isNaN(date.getTime())
+      ? 'Date not available'
+      : date.toLocaleDateString(undefined, {
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric',
+          hour: 'numeric',
+          minute: 'numeric',
+        });
   };
 
   return (
     <Container>
-      <Banner>
-        <BannerOverlay />
-        <BannerContent>
-          <Title>Events@Penn</Title>
-          <BannerText>
-            The Daily Pennsylvanian brings you every major event at Penn with easy ways to view, register, and engage!
-            Keep an eye on your favorite organizations, or that next company you want to recruit for.
-          </BannerText>
-        </BannerContent>
-      </Banner>
+      <Banner featuredEvents={featuredEvents} />
+
+      <FilterBar>
+        <SearchInput
+          type="text"
+          placeholder="Search events"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+        <Dropdown value={eventType} onChange={(e) => setEventType(e.target.value)}>
+          <option value="">All Types</option>
+          <option value="Conference">Conference</option>
+          <option value="Event">Event</option>
+          <option value="Seminar">Seminar</option>
+          <option value="Meetup">Meetup</option>
+          <option value="Other">Other</option>
+        </Dropdown>
+        <DateInput
+          type="date"
+          placeholder="After"
+          value={afterDate}
+          onChange={(e) => setAfterDate(e.target.value)}
+        />
+        <DateInput
+          type="date"
+          placeholder="Before"
+          value={beforeDate}
+          onChange={(e) => setBeforeDate(e.target.value)}
+        />
+      </FilterBar>
 
       <EventsGrid>
-        {events.length > 0 ? (
-          events.map(event => (
-            <EventCard key={event.id}>
-              {event.imageUrl && <EventImage src={event.imageUrl} alt={event.name} />}
-              <EventContent>
-                <EventTitle>{event.name}</EventTitle>
-                <EventDetail>Event Type: {event.type || "General"}</EventDetail>
-                <EventDetail>{event.description}</EventDetail>
-                <EventDate>{formatDate(event.time)}</EventDate>
-                <StyledLink to={`/events/${event._id}`}>
-                  <ViewButton>View Event</ViewButton>
-                </StyledLink>
-              </EventContent>
-            </EventCard>
-          ))
+        {filteredEvents.length > 0 ? (
+          filteredEvents.map(event => {
+            console.log("Event startTime:", event.startTime, "endTime:", event.endTime); // Log start and end times
+            return (
+              <EventCard
+                key={event.id}
+                id={event._id}
+                imageUrl={event.imageUrl}
+                name={event.name}
+                type={event.type}
+                description={event.description}
+                startTime={formatDate(event.startTime)}
+                endTime={formatDate(event.endTime)}
+              />
+            );
+          })
         ) : (
           <NoEventsMessage>No events available</NoEventsMessage>
         )}
@@ -72,127 +139,79 @@ const Home = () => {
 
 export default Home;
 
-// Styled Components
+// Styled Components for Home
 const Container = styled.div`
-  padding: 3rem 3rem;
+  padding: 2rem;
+  @media (max-width: 768px) {
+    padding: 1rem;
+  }
 `;
 
-const Banner = styled.div`
-  position: relative;
-  background-image: url('/banner.jpeg');
-  background-size: cover;
-  background-position: center;
-  height: 250px;
-  border-radius: 16px;
+const FilterBar = styled.div`
   display: flex;
-  align-items: center;
-  color: white;
-  overflow: hidden;
+  flex-wrap: wrap;
+  gap: 1rem;
   margin-bottom: 20px;
+  padding: 1rem;
+  background-color: #2f2f2f;
+  color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 `;
 
-const BannerOverlay = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-`;
-
-const BannerContent = styled.div`
-  position: relative;
-  max-width: 33%;
-  padding: 20px;
-  z-index: 1;
-  text-align: left;
-`;
-
-const Title = styled.h1`
-  font-size: 2.5rem;
-  font-weight: bold;
-  margin-bottom: 10px;
-`;
-
-const BannerText = styled.p`
+const SearchInput = styled.input`
+  flex: 1;
+  min-width: 180px;
+  padding: 0.5rem;
+  border-radius: 8px;
+  border: 1px solid #444;
+  background-color: #444;
+  color: white;
   font-size: 1rem;
+  outline: none;
+
+  ::placeholder {
+    color: #bbb;
+  }
+`;
+
+const Dropdown = styled.select`
+  flex: 1;
+  min-width: 140px;
+  padding: 0.5rem;
+  border-radius: 8px;
+  border: 1px solid #444;
+  background-color: #444;
+  color: white;
+  font-size: 1rem;
+  outline: none;
+`;
+
+const DateInput = styled.input`
+  flex: 1;
+  min-width: 140px;
+  padding: 0.5rem;
+  border-radius: 8px;
+  border: 1px solid #444;
+  background-color: #444;
+  color: white;
+  font-size: 1rem;
+  outline: none;
 `;
 
 const EventsGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 16px;
-`;
 
-const EventCard = styled.div`
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  background-color: #2f2f2f;
-  color: white;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-  border-radius: 8px;
-  overflow: hidden;
-  transition: transform 0.2s ease, background-color 0.2s ease;
-  
-  &:hover {
-    transform: scale(1.03);
-    background-color: #800000;
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
   }
-`;
-
-const EventImage = styled.img`
-  width: 100%;
-  height: 200px;
-  object-fit: cover;
-`;
-
-const EventContent = styled.div`
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-`;
-
-const EventTitle = styled.h3`
-  margin-top: 8px;
-  font-weight: bold;
-`;
-
-const EventDetail = styled.p`
-  margin: 4px 0;
-  font-size: 0.9rem;
-`;
-
-const EventDate = styled.span`
-  font-size: 0.8rem;
-  color: #bbb;
 `;
 
 const NoEventsMessage = styled.p`
   font-size: 1rem;
-`;
-
-const StyledLink = styled(Link)`
-  text-decoration: none;
-  color: inherit;
-`;
-
-const ViewButton = styled.button`
-  background-color: #000000;
   color: white;
-  text-decoration: none;
-  font-size: 0.9rem;
-  font-weight: 600;
-  padding: 0.5rem 1.25rem;
-  border-radius: 4px;
-  border: none;
-  cursor: pointer;
-  margin-top: 20px; // Added more top margin
-  transition: background-color 0.2s ease;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-
-  &:hover {
-    background-color: #6a6a6a;
-  }
+  text-align: center;
+  grid-column: span 3;
 `;

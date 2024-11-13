@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useAuth } from '../context/authContext';
 import { Card, CardContent, Button, Typography, Grid } from '@mui/material';
 import { Link } from 'react-router-dom';
+import styled from 'styled-components';
 
 const Profile = () => {
   const { user } = useAuth();
@@ -10,52 +11,23 @@ const Profile = () => {
 
   useEffect(() => {
     const fetchEvents = async () => {
-      if (user.type === 'org') {
-        try {
-          const response = await axios.get(`http://localhost:5038/organizations/${user.id}/events`, {
-            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-          });
-          const sortedEvents = response.data.data.sort((a, b) => 
-            new Date(a.time) - new Date(b.time)
-          );
-          setEvents(sortedEvents);
-        } catch (error) {
-          console.error('Error fetching events:', error);
-        }
-      } else if (user.type === 'student') {
-        try {
-          const response = await axios.get(`http://localhost:5038/students/${user.id}/events`, {
-            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-          });
-          const sortedEvents = response.data.data.sort((a, b) => 
-            new Date(a.time) - new Date(b.time)
-          );
-          setEvents(sortedEvents);
-        } catch (error) {
-          console.error('Error fetching registered events:', error);
-        }
+      const endpoint = user.type === 'org'
+        ? `http://localhost:5038/organizations/${user.id}/events`
+        : `http://localhost:5038/students/${user.id}/events`;
+
+      try {
+        const response = await axios.get(endpoint, {
+          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+        });
+        const sortedEvents = response.data.data.sort((a, b) => new Date(a.time) - new Date(b.time));
+        setEvents(sortedEvents);
+      } catch (error) {
+        console.error('Error fetching events:', error);
       }
     };
-    fetchEvents();
-  }, [user.type, user.id]);
-
-  const deleteEvent = async (eventId) => {
-    try {
-      await axios.delete(`http://localhost:5038/events/${eventId}`);
-      setEvents(events.filter(event => event._id !== eventId));
-    } catch (error) {
-      console.error(`Error deleting event: ${error}`);
-    }
-  };
-
-  const unregisterEvent = async (eventId) => {
-    try {
-      await axios.delete(`http://localhost:5038/students/${user.id}/events/${eventId}`);
-      setEvents(events.filter(event => event._id !== eventId));
-    } catch (error) {
-      console.error(`Error unregistering from event: ${error}`);
-    }
-  };
+    
+    if (user) fetchEvents();
+  }, [user]);
 
   const formatDate = (dateString) => {
     const options = { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric' };
@@ -63,89 +35,120 @@ const Profile = () => {
   };
 
   return (
-    <div style={{ padding: '20px' }}>
-      <Typography variant="h4" gutterBottom>
-        Profile
-      </Typography>
+    <Container>
       <Typography variant="h5" gutterBottom>
-        Welcome, {user.name}!
+        Welcome, {user?.name || 'User'}!
       </Typography>
 
-      <div>
+      <Section>
         <Typography variant="h6" gutterBottom>
           Your Events
         </Typography>
-        <Grid container spacing={2} justifyContent="center">
+        <StyledGrid container spacing={3}>
           {events.length > 0 ? (
             events.map(event => (
-              <Grid item xs={12} sm={6} md={4} key={event._id}>
-                <Card
-                  sx={{
-                    maxWidth: '350px',
-                    margin: '0 auto',
-                    backgroundColor: '#333',
-                    color: '#fff',
-                    borderRadius: '10px',
-                    boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)',
-                    transition: 'background-color 0.3s ease', // Smooth transition for hover effect
-                    '&:hover': {
-                      backgroundColor: '#8B0000', // Darker red on hover
-                    },
-                  }}
-                >
-                  {/* Event Image */}
-                  <img
-                    src={event.imageUrl || "https://via.placeholder.com/300"}
-                    alt={event.name}
-                    style={{ width: "100%", height: "150px", objectFit: "cover", borderRadius: '10px 10px 0 0' }}
-                  />
-                  <CardContent sx={{ paddingBottom: '16px' }}>
-                    {/* Event Title */}
-                    <Typography variant="h6" gutterBottom style={{ fontWeight: 'bold', color: '#fff' }}>
+              <StyledGridItem item xs={12} sm={6} md={4} key={event._id}>
+                <StyledCard>
+                  <EventImage src={event.imageUrl || "https://via.placeholder.com/300"} alt={event.name} />
+                  <CardContent>
+                    <Typography variant="h6" gutterBottom>
                       {event.name}
                     </Typography>
-
-                    {/* Event Type */}
-                    <Typography variant="body2" color="textSecondary">
+                    <Typography variant="body2">
                       Event Type: {event.type || "General"}
                     </Typography>
-
-                    {/* Event Description */}
-                    <Typography variant="body2" color="textSecondary">
+                    <Typography variant="body2" style={{ marginTop: 8 }}>
                       {event.description}
                     </Typography>
-
-                    {/* Event Date and Time */}
-                    <Typography variant="body2" color="textSecondary" sx={{ marginTop: '10px' }}>
+                    <Typography variant="body2" style={{ marginTop: 10 }}>
                       {formatDate(event.time)}
                     </Typography>
-
-                    {/* Single Button */}
-                    <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'center' }}>
-                      <Link to={`/events/${event._id}`} style={{ textDecoration: 'none', flexGrow: 1 }}>
-                        <Button
-                          variant="contained"
-                          sx={{
-                            backgroundColor: '#000',
-                            color: '#fff',
-                            width: '100%',
-                          }}
-                        >
+                    <ButtonContainer>
+                      <StyledLink to={`/events/${event._id}`}>
+                        <StyledButton variant="contained">
                           View Event
-                        </Button>
-                      </Link>
-                    </div>
+                        </StyledButton>
+                      </StyledLink>
+                    </ButtonContainer>
                   </CardContent>
-                </Card>
-              </Grid>
+                </StyledCard>
+              </StyledGridItem>
             ))
           ) : (
             <Typography variant="body1">No events available</Typography>
           )}
-        </Grid>
-      </div>
-    </div>
+        </StyledGrid>
+      </Section>
+    </Container>
   );
 };
 
 export default Profile;
+
+// Styled Components
+
+const Container = styled.div`
+  padding: 2rem 4rem;
+  background-color: #1e1e1e;
+  color: white;
+  min-height: 100vh;
+`;
+
+const Section = styled.div`
+  margin-top: 2rem;
+`;
+
+const StyledGrid = styled(Grid)`
+  justify-content: center;
+`;
+
+const StyledGridItem = styled(Grid)`
+  display: flex;
+  justify-content: center;
+`;
+
+const StyledCard = styled(Card)`
+  max-width: 350px;
+  background-color: #2f2f2f !important;
+  color: #fff !important;
+  border-radius: 16px !important;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3) !important;
+  transition: transform 0.3s ease, background-color 0.3s ease !important;
+
+  &:hover {
+    background-color: #4b0000 !important;
+    transform: scale(1.02);
+  }
+`;
+
+const EventImage = styled.img`
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 16px 16px 0 0;
+`;
+
+const ButtonContainer = styled.div`
+  margin-top: 16px;
+  display: flex;
+  justify-content: center;
+`;
+
+const StyledLink = styled(Link)`
+  text-decoration: none;
+  width: 100%;
+`;
+
+const StyledButton = styled(Button)`
+  width: 100%;
+  background-color: #000 !important;
+  color: #fff !important;
+  font-weight: 600 !important;
+  padding: 0.5rem 0 !important;
+  border-radius: 8px !important;
+  transition: background-color 0.2s ease !important;
+
+  &:hover {
+    background-color: #333 !important;
+  }
+`;

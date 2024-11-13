@@ -1,3 +1,4 @@
+// models/Event.js
 const mongoose = require('mongoose');
 
 const EventSchema = new mongoose.Schema({
@@ -12,13 +13,22 @@ const EventSchema = new mongoose.Schema({
   },
   type: String,
   location: String,
-  time: {
+  startTime: {
+    type: Date,
+    required: true,
+  },
+  endTime: {
     type: Date,
     required: true,
   },
   description: String,
   registrationForm: String,
   imageUrl: String,
+  featured: Boolean,
+  registeredStudents: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Student'
+  }],
 });
 
 module.exports = mongoose.model('Event', EventSchema);
