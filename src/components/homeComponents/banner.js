@@ -105,12 +105,12 @@ const BannerOverlay = styled.div`
   width: 100%;
   height: 100%;
   border-radius: 15px;
-  background: rgba(0, 0, 0, 0.5);
+  background: linear-gradient(to right, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.1) 100%);
 `;
 
 const BannerContent = styled.div`
   position: relative;
-  max-width: 33%;
+  max-width: 45%;
   padding: 20px;
   z-index: 1;
   text-align: left;

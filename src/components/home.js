@@ -57,7 +57,7 @@ const Home = () => {
 
       if (beforeDate) {
         const before = new Date(beforeDate);
-        filtered = filtered.filter(event => new Date(event.startTime) <= before);
+        filtered = filtered.filter(event => new Date(event.endTime) <= before);
       }
 
       setFilteredEvents(filtered);

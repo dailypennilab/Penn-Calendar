@@ -1,9 +1,9 @@
-// src/components/EventDetails.js
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import styled from 'styled-components';
 import { useAuth } from '../context/authContext';
+import StudentCard from './studentCard';
 
 const EventDetails = () => {
   const { eventId } = useParams();
@@ -26,6 +26,7 @@ const EventDetails = () => {
         }
 
         const registrationResponse = await axios.get(`http://localhost:5038/events/${eventId}/registrations`);
+        console.log(registrationResponse);
         setRegisteredStudents(registrationResponse.data.data);
       } catch (error) {
         console.error("Error fetching event details:", error);
@@ -71,7 +72,7 @@ const EventDetails = () => {
   };
 
   if (!event) {
-    return <LoadingMessage>Loading...</LoadingMessage>;
+    return (<NoEventMessage>No event exists.</NoEventMessage>);
   }
 
   return (
@@ -86,7 +87,9 @@ const EventDetails = () => {
             <Description>{event.description}</Description>
           </LeftColumn>
           <RightColumn>
-            <StyledButton maroon onClick={handleRegister}>Register Now</StyledButton>
+            {user && user.type === 'student' && (
+              <StyledButton maroon onClick={handleRegister}>Register Now</StyledButton>
+            )}
             <StyledButton onClick={handleInvite}>Invite Friends</StyledButton>
             {registrationMessage && <Message>{registrationMessage}</Message>}
             {copyMessage && <CopyMessage>{copyMessage}</CopyMessage>}
@@ -94,16 +97,23 @@ const EventDetails = () => {
         </ContentWrapper>
       </EventBox>
 
-      <RegisteredStudentsSection>
-        <RegisteredTitle>Registered Students</RegisteredTitle>
-        {registeredStudents.length > 0 ? (
-          registeredStudents.map(student => (
-            <StudentName key={student.id}>{student.name}</StudentName>
-          ))
-        ) : (
-          <NoStudentsMessage>No students have registered for this event yet.</NoStudentsMessage>
-        )}
-      </RegisteredStudentsSection>
+      {user && user.type === 'organization' && event && event.organizer._id === user.id (
+        <RegisteredStudentsSection>
+          <RegisteredTitle>Registered Students</RegisteredTitle>
+          <StudentGrid>
+            {registeredStudents.length > 0 ? (
+              registeredStudents.map((student) => (
+                <StudentCard 
+                  key={student._id} 
+                  student={student} 
+                />
+              ))
+            ) : (
+              <NoStudentsMessage>No students have registered for this event yet.</NoStudentsMessage>
+            )}
+          </StudentGrid>
+        </RegisteredStudentsSection>
+      )}
     </Container>
   );
 };
@@ -130,6 +140,32 @@ const EventBox = styled.div`
   @media (max-width: 768px) {
     padding: 1.5rem;
   }
+`;
+
+// Other styled components remain the same
+const RegisteredStudentsSection = styled.div`
+  margin-top: 2rem;
+  padding: 1rem;
+  background-color: #2f2f2f;
+  border-radius: 8px;
+`;
+
+const StudentGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+`;
+
+const RegisteredTitle = styled.h3`
+  color: #fff;
+  font-weight: bold;
+  margin-bottom: 1rem;
+`;
+
+const NoStudentsMessage = styled.p`
+  color: #ccc;
+  font-size: 0.9rem;
 `;
 
 const EventImage = styled.img`
@@ -236,35 +272,11 @@ const CopyMessage = styled.p`
   text-align: center;
 `;
 
-const LoadingMessage = styled.div`
+const NoEventMessage = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
   font-size: 1.5rem;
   color: #555;
-`;
-
-const RegisteredStudentsSection = styled.div`
-  margin-top: 2rem;
-  padding: 1rem;
-  background-color: #2f2f2f;
-  border-radius: 8px;
-`;
-
-const RegisteredTitle = styled.h3`
-  color: #fff;
-  font-weight: bold;
-  margin-bottom: 1rem;
-`;
-
-const StudentName = styled.p`
-  color: #ddd;
-  font-size: 1rem;
-  margin: 0.3rem 0;
-`;
-
-const NoStudentsMessage = styled.p`
-  color: #ccc;
-  font-size: 0.9rem;
 `;

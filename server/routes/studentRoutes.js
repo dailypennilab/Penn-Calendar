@@ -24,7 +24,7 @@ router.get('/students/:studentId', async (req, res) => {
   }
 
   try {
-    const student = await Student.findById(studentId).populate('organizations').populate('events');
+    const student = await Student.findById(studentId).populate('organizations').populate('registeredEvents');
     if (!student) {
       return res.status(404).json({ success: false, message: 'Student not found' });
     }
@@ -44,11 +44,8 @@ router.put('/students/:studentId', async (req, res) => {
   }
 
   try {
-    if (student.password) {
-      student.password = await bcrypt.hash(password, 10);
-    }
-
-    const updatedStudent = Student.findByIdAndUpdate(studentId, student, { new: true });
+    const updatedStudent = await Student.findByIdAndUpdate(studentId, student, { new: true });
+    console.log(updatedStudent);
 
     if (!updatedStudent) {
       return res.status(404).json({ success: false, message: 'Student not found' });
@@ -56,6 +53,7 @@ router.put('/students/:studentId', async (req, res) => {
 
     res.status(200).json({ success: true, data: updatedStudent });
   } catch (err) {
+    console.log(err);
     res.status(500).json({ success: false, message: 'Error updating student profile' });
   }
 });
@@ -127,7 +125,7 @@ router.post('/students/:studentId/events/:eventId/register', async (req, res) =>
 // Unregister student from an event
 router.delete('/students/:studentId/events/:eventId', async (req, res) => {
   const { studentId, eventId } = req.params;
-c
+
   if (!mongoose.Types.ObjectId.isValid(studentId)) {
     return res.status(404).json({ success: false, message: "Invalid Student ID" });
   }

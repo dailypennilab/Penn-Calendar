@@ -6,7 +6,6 @@ const StudentSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  year: String,
   email: {
     type: String,
     required: true,
@@ -22,7 +21,11 @@ const StudentSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true,
-  }
+  },
+  major: String,
+  graduationYear: Number,
+  linkedin: String,
+  imageUrl: String,
 });
 
 module.exports = mongoose.model('Student', StudentSchema);

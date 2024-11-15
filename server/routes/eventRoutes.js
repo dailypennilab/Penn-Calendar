@@ -9,7 +9,7 @@ const router = express.Router();
 // Fetch all events
 router.get('/events', async (req, res) => {
   try {
-    const events = await Event.find({});
+    const events = await Event.find({}).populate('organizer');
     res.status(200).json({ success: true, data: events });
   } catch (err) {
     res.status(500).json({ success: false, message: 'Error fetching events' });
@@ -26,7 +26,7 @@ router.get('/events/:eventId/registrations', async (req, res) => {
 
   try {
     // Find the event and populate the registeredStudents field
-    const event = await Event.findById(eventId).populate('registeredStudents', 'name');
+    const event = await Event.findById(eventId).populate('registeredStudents');
     if (!event) {
       return res.status(404).json({ success: false, message: 'Event not found' });
     }

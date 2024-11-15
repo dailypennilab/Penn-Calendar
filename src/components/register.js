@@ -8,7 +8,11 @@ const Register = () => {
     name: '',
     email: '',
     password: '',
-    orgType: ''
+    orgType: '',
+    major: '',
+    graduationYear: '',
+    linkedin: '',
+    imageUrl: '',
   });
   const [message, setMessage] = useState('');
 
@@ -22,54 +26,22 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const endpoint = isStudentForm
-        ? 'http://localhost:5038/register/student'
-        : 'http://localhost:5038/register/org';
-
-      const response = await axios.post(endpoint, formData);
+      const response = await axios.post('http://localhost:5038/register/student', formData);
       setMessage(response.data.success ? `Registration successful for ${response.data.data.name}` : response.data.message);
     } catch (error) {
       setMessage('Error during registration. Please try again.');
     }
   };
 
-  const toggleForm = () => {
-    setIsStudentForm(!isStudentForm);
-    setMessage('');
-  };
-
   return (
     <Container maxWidth="sm" sx={{ backgroundColor: '#dbabad', padding: '40px', borderRadius: '10px', marginTop: '40px' }}>
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '20px' }}>
         <Typography variant="h5" component="h1" sx={{ fontWeight: 'bold' }}>
-          {isStudentForm ? 'Register as Student' : 'Register as Organization'}
+          {'Create an Account'}
         </Typography>
       </Box>
       
-      <form onSubmit={handleSubmit}>
-        { !isStudentForm && (
-          <FormControl fullWidth margin="normal">
-          <InputLabel id="type-label">Organization Type</InputLabel>
-          <Select
-            labelId="type-label"
-            id="orgType"
-            name="orgType"
-            label="Organization Type"
-            value={formData.type}
-            onChange={handleChange}
-            sx={{
-              backgroundColor: '#f0f0f0',
-              color: '#000000',
-              '& .MuiSelect-select': {
-                color: '#000000',
-              },
-            }}
-          >
-            <MenuItem value="student_org" sx={{ color: '#000000'}}>Student Organization</MenuItem>
-            <MenuItem value="company" sx={{ color: '#000000'}}>Company</MenuItem>
-          </Select>
-          </FormControl>
-        )}
+      <form onSubmit={handleSubmit}>        
         <TextField
           label="Name"
           name="name"
@@ -80,6 +52,7 @@ const Register = () => {
           margin="normal"
           sx={{ backgroundColor: '#f0f0f0', borderRadius: '5px' }}
         />
+        
         <TextField
           label="Email"
           name="email"
@@ -90,6 +63,7 @@ const Register = () => {
           margin="normal"
           sx={{ backgroundColor: '#f0f0f0', borderRadius: '5px' }}
         />
+        
         <TextField
           label="Password"
           name="password"
@@ -102,7 +76,47 @@ const Register = () => {
           sx={{ backgroundColor: '#f0f0f0', borderRadius: '5px' }}
         />
 
-        {/* Register Button */}
+        <TextField
+          label="Major"
+          name="major"
+          value={formData.major}
+          onChange={handleChange}
+          fullWidth
+          margin="normal"
+          sx={{ backgroundColor: '#f0f0f0', borderRadius: '5px' }}
+        />
+        
+        <TextField
+          label="Graduation Year"
+          name="graduationYear"
+          type="number"
+          value={formData.graduationYear}
+          onChange={handleChange}
+          fullWidth
+          margin="normal"
+          sx={{ backgroundColor: '#f0f0f0', borderRadius: '5px' }}
+        />
+
+        <TextField
+          label="LinkedIn Profile URL"
+          name="linkedin"
+          value={formData.linkedin}
+          onChange={handleChange}
+          fullWidth
+          margin="normal"
+          sx={{ backgroundColor: '#f0f0f0', borderRadius: '5px' }}
+        />
+        
+        <TextField
+          label="Profile Picture URL"
+          name="imageUrl"
+          value={formData.imageUrl}
+          onChange={handleChange}
+          fullWidth
+          margin="normal"
+          sx={{ backgroundColor: '#f0f0f0', borderRadius: '5px' }}
+        />
+
         <Button
           variant="contained"
           type="submit"
@@ -125,26 +139,29 @@ const Register = () => {
         </Button>
       </form>
 
-      {/* Message */}
       {message && (
         <Typography variant="body1" color="textSecondary" sx={{ marginTop: '20px' }}>
           {message}
         </Typography>
       )}
 
-      {/* Toggle Form Type */}
-      <Typography
+<Typography
         variant="body2"
         color="primary"
-        onClick={toggleForm}
         sx={{
           marginTop: '20px',
-          cursor: 'pointer',
           textAlign: 'center',
           fontWeight: 'bold',
         }}
       >
-        {isStudentForm ? "Not a student? Register as an organization." : "Not an organization? Register as a student."}
+        Want to register an organization? Contact us at{' '}
+        <a
+          href="mailto:ilabmanager@dailypennsylvanian.com"
+          style={{ color: 'inherit', textDecoration: 'underline' }}
+        >
+          ilabmanager@dailypennsylvanian.com
+        </a>
+        !
       </Typography>
     </Container>
   );

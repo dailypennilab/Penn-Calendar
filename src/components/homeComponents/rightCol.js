@@ -113,7 +113,7 @@ const RightCol = () => {
           registeredEvents.map(event => (
             <EventBox key={event._id}>
               <EventTitle>{event.name}</EventTitle>
-              <EventTime>{formatDate(event.time)}</EventTime>
+              <EventTime>{formatDate(event.startTime)}</EventTime>
             </EventBox>
           ))
         ) : (
