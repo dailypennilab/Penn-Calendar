@@ -26,6 +26,10 @@ const StudentSchema = new mongoose.Schema({
   graduationYear: Number,
   linkedin: String,
   imageUrl: String,
+  isVerified: {
+    type: Boolean,
+    default: false,
+  }
 });
 
 module.exports = mongoose.model('Student', StudentSchema);

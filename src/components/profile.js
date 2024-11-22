@@ -14,7 +14,6 @@ const Profile = () => {
     graduationYear: '',
     linkedin: '',
     imageUrl: '',
-    email: '',
   });
   const [isLoading, setIsLoading] = useState(true);
 
@@ -129,14 +128,6 @@ const Profile = () => {
             label="Profile Picture URL"
             name="imageUrl"
             value={profileData.imageUrl}
-            onChange={handleProfileChange}
-            fullWidth
-            margin="normal"
-          />
-          <StyledTextField
-            label="Email"
-            name="email"
-            value={profileData.email}
             onChange={handleProfileChange}
             fullWidth
             margin="normal"

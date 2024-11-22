@@ -9,6 +9,7 @@ import EventDetails from './components/eventDetails';
 import Profile from './components/profile';
 import { AuthProvider } from './context/authContext';
 import { ProtectedRoute } from './components/protectedRoute';
+import VerifyEmail from './components/verifyEmail';
 import Footer from './components/footer';
 import './App.css';  /* Make sure to import your CSS file */
 
@@ -23,6 +24,7 @@ function App() {
             <Route path="/events/:eventId" element={<EventDetails />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/verify-email" element={<VerifyEmail />} />
 
             <Route path="/create-event" element={
                 <ProtectedRoute> <EventRegistrationForm /> </ProtectedRoute>

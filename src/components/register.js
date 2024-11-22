@@ -27,7 +27,7 @@ const Register = () => {
     e.preventDefault();
     try {
       const response = await axios.post('http://localhost:5038/register/student', formData);
-      setMessage(response.data.success ? `Registration successful for ${response.data.data.name}` : response.data.message);
+      setMessage(response.data.message);
     } catch (error) {
       setMessage('Error during registration. Please try again.');
     }
